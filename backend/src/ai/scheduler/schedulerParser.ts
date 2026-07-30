@@ -32,10 +32,12 @@ Schema:
 
 Rules:
 
+- Return ONLY JSON
 - No markdown
-- No explanation
-- No code block
-- JSON only
+- No explanations
+- No code blocks
+- Use "teams", "in-person", or "hybrid" for locationType
+- Use "low", "normal", or "high" for priority
 `,
       userPrompt: prompt,
     });
@@ -44,45 +46,130 @@ Rules:
     console.log(reply);
     console.log("==========================================\n");
 
+    // AI failed or returned plain text instead of JSON
+    if (!reply || !reply.trim().startsWith("{")) {
+      return {
+        success: false,
+        meeting: null,
+        warnings: [
+          reply || "AI scheduling service is unavailable."
+        ],
+        suggestions: [
+          "Please try again in a few minutes."
+        ],
+      };
+    }
+
     try {
       const meeting = JSON.parse(reply) as ParsedMeetingRequest;
-      if ("error" in meeting) {
-  return {
-    success: false,
-    meeting: null,
-    warnings: [
-      "AI scheduling service is temporarily unavailable."
-    ],
-    suggestions: [
-      "Please try again in a few minutes."
-    ],
-  };
+      const q = prompt.toLowerCase();
+      console.log("Prompt:", q);
+
+const exactTime = q.match(
+  /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i
+);
+console.log("Prompt:", q);
+console.log("Exact Time:", exactTime);
+
+console.log("Exact Time Match:", exactTime);
+  
+
+// Date
+if (q.includes("today")) {
+  meeting.preferredDate = "Today";
+} else if (q.includes("tomorrow")) {
+  meeting.preferredDate = "Tomorrow";
+} else {
+  const day = q.match(
+    /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/
+  );
+
+  if (day) {
+    meeting.preferredDate =
+      day[0].charAt(0).toUpperCase() + day[0].slice(1);
+  }
 }
 
-// Normalize location
-meeting.locationType =
-  meeting.locationType?.toLowerCase() === "teams"
-    ? "teams"
-    : meeting.locationType?.toLowerCase() === "in person"
-    ? "in-person"
-    : meeting.locationType?.toLowerCase() === "hybrid"
-    ? "hybrid"
-    : "teams";
+// Normalize preferred time only if Gemini returned a day period.
+// Keep exact times like "10:00 AM".
 
-// Normalize priority
-meeting.priority =
-  meeting.priority?.toLowerCase() === "low"
-    ? "low"
-    : meeting.priority?.toLowerCase() === "high"
-    ? "high"
-    : "normal";
+if (meeting.preferredTime) {
 
-// Default title if Gemini leaves it blank
-if (!meeting.title || meeting.title.trim().length === 0) {
-  meeting.title = "Untitled Meeting";
+  const time = meeting.preferredTime.toLowerCase();
+
+  if (
+    time === "morning" ||
+    time === "afternoon" ||
+    time === "evening" ||
+    time === "any"
+  ) {
+    meeting.preferredTime = time as any;
+  }
+
+  // Otherwise keep Gemini's exact time (e.g. 10:00 AM, 2:30 PM)
+
+} else if (exactTime) {
+
+  const hour = Number(exactTime[1]);
+  const minute = exactTime[2] ?? "00";
+  const period = exactTime[3].toUpperCase();
+
+  meeting.preferredTime = `${hour}:${minute} ${period}` as any;
+
+} else {
+
+  meeting.preferredTime = "any";
+
 }
 
-      console.log("Parsed meeting:", meeting);
+// Duration
+const duration = q.match(/(\d+)\s*(minute|min)/);
+
+if (duration) {
+  meeting.durationMinutes = Number(duration[1]);
+}
+
+      // Normalize location
+      meeting.locationType =
+        meeting.locationType?.toLowerCase() === "teams"
+          ? "teams"
+          : meeting.locationType?.toLowerCase() === "in person"
+          ? "in-person"
+          : meeting.locationType?.toLowerCase() === "hybrid"
+          ? "hybrid"
+          : "teams";
+
+      // Normalize priority
+      meeting.priority =
+        meeting.priority?.toLowerCase() === "low"
+          ? "low"
+          : meeting.priority?.toLowerCase() === "high"
+          ? "high"
+          : "normal";
+
+      // Default title
+      if (!meeting.title || meeting.title.trim() === "") {
+        meeting.title = "Untitled Meeting";
+      }
+
+      // Default duration
+      if (!meeting.durationMinutes || meeting.durationMinutes <= 0) {
+        meeting.durationMinutes = 30;
+      }
+
+      // Default attendees
+      if (!meeting.attendees) {
+        meeting.attendees = [];
+      }
+
+      // Default date
+      if (!meeting.preferredDate) {
+        meeting.preferredDate = "Today";
+      }
+
+
+      console.log("Parsed meeting:");
+      console.log(JSON.stringify(meeting, null, 2));
 
       return {
         success: true,
@@ -92,15 +179,16 @@ if (!meeting.title || meeting.title.trim().length === 0) {
       };
     } catch (error) {
       console.error("Scheduler JSON Parse Error:", error);
+      console.error("Raw AI Response:", reply);
 
       return {
         success: false,
         meeting: null,
         warnings: [
-          "Unable to understand the scheduling request."
+          "AI returned an invalid scheduling response."
         ],
         suggestions: [
-          "Try including attendees, duration and date."
+          "Please try your request again."
         ],
       };
     }

@@ -5,7 +5,6 @@ import { getViolinNews } from "../../violinService.js";
 
 import { buildExecutiveContext } from "./executiveContextBuilder.js";
 
-
 export function buildMorningBriefContext(): string {
   const calendar = getCalendarSummary();
   const meetings = getMeetings();
@@ -31,25 +30,33 @@ export function buildMorningBriefContext(): string {
     .slice(0, 3);
 
   const executiveContext = buildExecutiveContext({
-    meeting: todaysMeetings,
+    dashboard: calendar,
     emails: criticalEmails,
     violin: criticalViolin,
   });
 
-  const executiveInsights = buildExecutiveInsights(
-    criticalEmails,
-    criticalViolin
-  );
-
   return `
-========== EXECUTIVE MORNING BRIEF ==========
+========== EXECUTIVE MORNING BRIEF CONTEXT ==========
 
-CALENDAR
+TODAY'S MEETINGS
 
-${JSON.stringify(calendar, null, 2)}
+${todaysMeetings
+  .map(
+    (meeting) => `
+Title: ${meeting.title}
+Time: ${meeting.time}
+Duration: ${meeting.duration}
+Location: ${meeting.location}
+Priority: ${meeting.priority}
+Status: ${meeting.status}
+`
+  )
+  .join("\n")}
 
 ${executiveContext}
 
-${executiveInsights}
+====================================================
+
+Use ONLY the information above when generating the executive morning brief.
 `;
 }

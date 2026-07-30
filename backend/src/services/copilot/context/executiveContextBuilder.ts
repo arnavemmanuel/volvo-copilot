@@ -11,21 +11,20 @@ export function buildExecutiveContext({
   violin = [],
   dashboard,
 }: ExecutiveContextOptions): string {
+
   const sections: string[] = [];
 
   sections.push("========== EXECUTIVE CONTEXT ==========");
+  sections.push("");
 
   if (meeting) {
-    sections.push("");
-    sections.push("CURRENT MEETING");
-    sections.push("----------------");
+    sections.push("## CURRENT MEETING");
     sections.push(formatObject(meeting));
+    sections.push("");
   }
 
   if (emails.length > 0) {
-    sections.push("");
-    sections.push("RELATED EMAILS");
-    sections.push("----------------");
+    sections.push("## RELEVANT EMAILS");
 
     emails.forEach((email, index) => {
       sections.push(`Email ${index + 1}`);
@@ -35,28 +34,28 @@ export function buildExecutiveContext({
   }
 
   if (violin.length > 0) {
-    sections.push("");
-    sections.push("VIOLIN UPDATES");
-    sections.push("----------------");
+    sections.push("## RELEVANT VIOLIN UPDATES");
 
-    violin.forEach((item, index) => {
+    violin.forEach((update, index) => {
       sections.push(`Update ${index + 1}`);
-      sections.push(formatObject(item));
+      sections.push(formatObject(update));
       sections.push("");
     });
   }
 
   if (dashboard) {
-    sections.push("");
-    sections.push("EXECUTIVE DASHBOARD");
-    sections.push("----------------");
+    sections.push("## EXECUTIVE DASHBOARD");
     sections.push(formatObject(dashboard));
+    sections.push("");
   }
+
+  sections.push("========== END OF CONTEXT ==========");
 
   return sections.join("\n");
 }
 
 function formatObject(value: unknown, indent = 0): string {
+
   const spacing = "  ".repeat(indent);
 
   if (value === null || value === undefined) {
@@ -75,10 +74,8 @@ function formatObject(value: unknown, indent = 0): string {
 
   return Object.entries(value as Record<string, unknown>)
     .map(([key, val]) => {
-      if (
-        typeof val === "object" &&
-        val !== null
-      ) {
+
+      if (typeof val === "object" && val !== null) {
         return `${spacing}${prettify(key)}:\n${formatObject(
           val,
           indent + 1
@@ -94,6 +91,6 @@ function prettify(text: string): string {
   return text
     .replace(/([A-Z])/g, " $1")
     .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/\b\w/g, c => c.toUpperCase())
     .trim();
 }

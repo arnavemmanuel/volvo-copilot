@@ -1,4 +1,5 @@
 import { askGemini } from "../../ai/geminiService.js";
+import { shouldUseAI } from "../../ai/decision/shouldUseAI.js";
 import { getEmails } from "../../emailService.js";
 import type { CopilotResponse } from "../../copilotService.js";
 
@@ -10,7 +11,10 @@ export async function emailHandler(
 
   let relevantEmails = emails;
 
-  // Filter by priority
+  // ----------------------------------
+  // Priority Filters
+  // ----------------------------------
+
   if (query.includes("critical")) {
     relevantEmails = emails.filter(
       (email) => email.priority === "Critical"
@@ -23,7 +27,10 @@ export async function emailHandler(
     );
   }
 
-  // Find specific email
+  // ----------------------------------
+  // Find Matching Email
+  // ----------------------------------
+
   const matchedEmail = emails.find(
     (email) =>
       query.includes(email.subject.toLowerCase()) ||
@@ -31,9 +38,13 @@ export async function emailHandler(
       query.includes(email.category.toLowerCase())
   );
 
-  // Draft reply request
+  // ----------------------------------
+  // Draft Reply
+  // ----------------------------------
+
   if (
-    (query.includes("draft") || query.includes("reply")) &&
+    (query.includes("draft") ||
+      query.includes("reply")) &&
     matchedEmail
   ) {
     return {
@@ -43,53 +54,171 @@ export async function emailHandler(
 
 ${matchedEmail.draftReply}
 `,
+      actions: [
+        {
+          id: matchedEmail.id ?? "email-draft",
+          entity: "email",
+          title: matchedEmail.subject,
+          subtitle: `Reply to ${matchedEmail.sender}`,
+          route: "/emails",
+        },
+      ],
     };
   }
 
-  const prompt = `
-User Request:
-${userPrompt || "Summarize my inbox"}
+  // ----------------------------------
+  // Email Summary
+  // ----------------------------------
 
-Emails:
+  if (
+    (query.includes("summarize") ||
+      query.includes("summary")) &&
+    matchedEmail
+  ) {
+    return {
+      message: `# 📧 Email Summary
+
+## ${matchedEmail.subject}
+
+**From:** ${matchedEmail.sender}
+
+**Priority:** ${matchedEmail.priority}
+
+**Received:** ${matchedEmail.received}
+
+${matchedEmail.summary}
+`,
+      actions: [
+        {
+          id: matchedEmail.id ?? "email-summary",
+          entity: "email",
+          title: matchedEmail.subject,
+          subtitle: `${matchedEmail.priority} • ${matchedEmail.sender}`,
+          route: "/emails",
+        },
+      ],
+    };
+  }
+
+  // ----------------------------------
+  // Inbox Retrieval (No AI Needed)
+  // ----------------------------------
+
+  if (
+    query.includes("critical") ||
+    query.includes("high") ||
+    query.includes("show emails") ||
+    query.includes("list emails") ||
+    query.includes("show inbox") ||
+    query.includes("inbox") ||
+    query.includes("emails")
+  ) {
+    return {
+      message: `# 📧 Inbox
+
+${relevantEmails
+  .map(
+    (email) => `
+## ${email.subject}
+
+**From:** ${email.sender}
+
+**Priority:** ${email.priority}
+
+**Received:** ${email.received}
+
+${email.summary}
+
+---
+`
+  )
+  .join("\n")}
+`,
+      actions: relevantEmails.slice(0, 4).map((email, index) => ({
+        id: email.id ?? `email-${index}`,
+        entity: "email",
+        title: email.subject,
+        subtitle: `${email.priority} • ${email.sender}`,
+        route: "/emails",
+      })),
+    };
+  }
+
+  // ----------------------------------
+  // AI Decision
+  // ----------------------------------
+
+  const decision = shouldUseAI(userPrompt);
+
+  if (!decision.useAI) {
+    return {
+      message: `# 📧 Inbox
+
+${relevantEmails
+  .map(
+    (email) => `
+## ${email.subject}
+
+**From:** ${email.sender}
+
+**Priority:** ${email.priority}
+
+**Received:** ${email.received}
+
+${email.summary}
+
+---
+`
+  )
+  .join("\n")}
+`,
+      actions: relevantEmails.slice(0, 4).map((email, index) => ({
+        id: email.id ?? `email-${index}`,
+        entity: "email",
+        title: email.subject,
+        subtitle: `${email.priority} • ${email.sender}`,
+        route: "/emails",
+      })),
+    };
+  }
+
+  // ----------------------------------
+  // AI Executive Brief
+  // ----------------------------------
+
+  const prompt = `
+User Request
+
+${userPrompt}
+
+Emails
 
 ${JSON.stringify(relevantEmails, null, 2)}
 `;
 
   const reply = await askGemini({
     systemPrompt: `
-You are an Executive AI Assistant for the Head of Digital Production at Volvo.
+You are the Executive AI Assistant for the Head of Digital Production.
 
-Your responsibilities are to:
+Your responsibilities:
 
-- Prioritize emails by business impact.
-- Highlight anything requiring executive attention.
-- Explain why each important email matters.
-- Recommend the next action.
-- Ignore unnecessary detail.
+- Prioritize emails
+- Identify executive risks
+- Recommend actions
+- Summarize executive communications
+- Keep responses concise
 
-If the user asks for:
-- critical emails → show only critical emails
-- high priority emails → show critical and high
-- summary → summarize the inbox
-- supplier escalation → focus only on that email
+Return GitHub Markdown.
 
-Return the response in GitHub Markdown.
-
-Use this format:
+Sections:
 
 # 📧 Executive Email Brief
 
 ## 🔴 Critical
 
-...
-
 ## 🟠 High Priority
 
-...
-
 ## 🟢 Other Emails
-
-...
 
 ## ✅ Recommended Actions
 `,
@@ -98,5 +227,12 @@ Use this format:
 
   return {
     message: reply,
+    actions: relevantEmails.slice(0, 4).map((email, index) => ({
+      id: email.id ?? `email-${index}`,
+      entity: "email",
+      title: email.subject,
+      subtitle: `${email.priority} • ${email.sender}`,
+      route: "/emails",
+    })),
   };
 }

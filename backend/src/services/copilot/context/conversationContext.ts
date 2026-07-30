@@ -1,6 +1,8 @@
 export interface ConversationContext {
   lastIntent?: string;
+
   lastMeeting?: {
+    id?: number;
     title?: string;
     durationMinutes?: number;
     attendees?: string[];

@@ -15,6 +15,7 @@ import type { CopilotResponse } from "../../copilotService.js";
 export async function schedulerHandler(
   userPrompt: string
 ): Promise<CopilotResponse> {
+
   const parsed = await schedulerParser.parse(userPrompt);
 
   if (!parsed.success || !parsed.meeting) {
@@ -30,15 +31,16 @@ ${parsed.suggestions.join("\n")}
 `,
     };
   }
+
   console.log("Parsed meeting object:");
-console.log(JSON.stringify(parsed.meeting, null, 2));
+  console.log(JSON.stringify(parsed.meeting, null, 2));
 
   const errors = schedulerValidator.validate(parsed.meeting);
 
   if (errors.length > 0) {
     return {
       message: `
-# ⚠ Validation Failed
+# ⚠️ Validation Failed
 
 ${errors.map((e) => `- ${e}`).join("\n")}
 `,
@@ -64,44 +66,45 @@ ${errors.map((e) => `- ${e}`).join("\n")}
   const alternatives = getAlternativeMeetings(suggestion.id);
 
   const createdMeeting = createMeeting({
-  title: parsed.meeting.title,
-  durationMinutes: parsed.meeting.durationMinutes,
-
-  attendees: (parsed.meeting.attendees ?? []).map(
-  (attendee) => attendee.name
-),
-
-  preferredDate:
-    parsed.meeting.preferredDate ?? "Today",
-
-  preferredTime:
-    parsed.meeting.preferredTime ?? "any",
-
-  locationType: parsed.meeting.locationType,
-});
-
-  updateConversationContext({
-  lastIntent: "scheduler",
-
-  lastMeeting: {
     title: parsed.meeting.title,
     durationMinutes: parsed.meeting.durationMinutes,
 
-    attendees: parsed.meeting.attendees.map(
+    attendees: (parsed.meeting.attendees ?? []).map(
       (attendee) => attendee.name
     ),
 
-    preferredDate: parsed.meeting.preferredDate,
+    preferredDate:
+      parsed.meeting.preferredDate ?? "Today",
 
-    preferredTime: parsed.meeting.preferredTime,
+    preferredTime:
+      parsed.meeting.preferredTime ?? "morning",
 
-    locationType: parsed.meeting.locationType,
-  },
+    locationType:
+      parsed.meeting.locationType,
+  });
 
-  lastMeetingTitle: parsed.meeting.title,
+  // IMPORTANT:
+  // Store the CREATED meeting so follow-up edits work.
 
-  lastTopic: parsed.meeting.title,
-});
+  updateConversationContext({
+
+    lastIntent: "meeting_edit",
+
+    lastMeeting: {
+      id: createdMeeting.id,
+      title: createdMeeting.title,
+      durationMinutes: createdMeeting.durationMinutes,
+      attendees: createdMeeting.attendees,
+      preferredDate: createdMeeting.preferredDate,
+      preferredTime: createdMeeting.preferredTime,
+      locationType: createdMeeting.locationType,
+    },
+
+    lastMeetingTitle: createdMeeting.title,
+
+    lastTopic: createdMeeting.title,
+
+  });
 
   return {
     message: `
@@ -150,15 +153,12 @@ ${alternatives
 
 ---
 
-## Conversation Memory Updated
+You can now say:
 
-You can now ask follow-up questions like:
-
-- Move it to Friday.
-- Make it a Teams meeting.
-- Add Rahul.
-- Change the duration to 45 minutes.
-- Cancel this meeting.
+- Move it to Friday
+- Make it a Teams meeting
+- Change it to 45 minutes
+- Cancel it
 `,
   };
 }

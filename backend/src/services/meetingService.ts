@@ -12,7 +12,30 @@ export interface Meeting {
   priority: "high" | "medium" | "low";
   status: "upcoming" | "ongoing" | "completed";
 }
+function getMeetingStatus(
+  meetingTime: string,
+  durationMinutes: number
+): "completed" | "ongoing" | "upcoming" {
+  const now = new Date();
 
+  const [hours, minutes] = meetingTime.split(":").map(Number);
+
+  const start = new Date(now);
+  start.setHours(hours, minutes, 0, 0);
+
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + durationMinutes);
+
+  if (now < start) {
+    return "upcoming";
+  }
+
+  if (now >= start && now <= end) {
+    return "ongoing";
+  }
+
+  return "completed";
+}
 export function getMeetings(): Meeting[] {
   const meetings = getCalendarMeetings();
 
@@ -34,11 +57,9 @@ export function getMeetings(): Meeting[] {
           ? "medium"
           : "low",
 
-      status:
-        index === 0
-          ? "completed"
-          : index === 1
-          ? "ongoing"
-          : "upcoming",
+      status: getMeetingStatus(
+  meeting.preferredTime,
+  meeting.durationMinutes
+),
     }));
 }

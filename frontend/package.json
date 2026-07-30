@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "frontend-new",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/msal-browser": "^5.17.1",
+    "@azure/msal-react": "^5.5.3",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@tailwindcss/typography": "^0.5.20",
+    "@tailwindcss/vite": "^4.3.3",
+    "highlight.js": "^11.11.1",
+    "lucide-react": "^1.25.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.18.1",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

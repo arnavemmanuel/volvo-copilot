@@ -2,7 +2,7 @@
 
 import {
   ParsedMeetingRequest,
-} from "../types/schedulerTypes";
+} from "../types/schedulerTypes.js";
 
 export class SchedulerValidator {
   validate(meeting: ParsedMeetingRequest): string[] {
@@ -20,14 +20,21 @@ export class SchedulerValidator {
       errors.push("Meeting duration cannot exceed 8 hours.");
     }
 
-    if (
-      meeting.preferredTime &&
-      !["morning", "afternoon", "evening", "any"].includes(
-        meeting.preferredTime
-      )
-    ) {
-      errors.push("Invalid preferred time.");
-    }
+    if (meeting.preferredTime) {
+  const validDayPart = [
+    "morning",
+    "afternoon",
+    "evening",
+    "any",
+  ].includes(meeting.preferredTime.toLowerCase());
+
+  const validClockTime =
+    /^\d{1,2}:\d{2}\s?(AM|PM)$/i.test(meeting.preferredTime);
+
+  if (!validDayPart && !validClockTime) {
+    errors.push("Invalid preferred time.");
+  }
+}
 
     if (
       !["teams", "in-person", "hybrid"].includes(meeting.locationType)

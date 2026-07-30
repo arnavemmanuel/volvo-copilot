@@ -102,5 +102,35 @@ Use only the supplied context.
 
   return {
     message: reply,
+    actions: [
+      {
+        id: "brief-emails",
+        type: "email",
+        title: "Priority Emails",
+        subtitle: "Review executive inbox",
+        route: "/emails",
+      },
+      {
+        id: "brief-meetings",
+        type: "meeting",
+        title: "Today's Meetings",
+        subtitle: "View schedule and preparation",
+        route: "/meetings",
+      },
+      {
+        id: "brief-documents",
+        type: "document",
+        title: "Operational Updates",
+        subtitle: "Review VIOLIN updates",
+        route: "/documents",
+      },
+      {
+        id: "brief-violin",
+        type: "violin",
+        title: "VIOLIN Dashboard",
+        subtitle: "Latest production updates",
+        route: "/documents",
+      },
+    ],
   };
 }

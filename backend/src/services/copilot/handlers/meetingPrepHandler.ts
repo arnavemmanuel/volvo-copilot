@@ -8,11 +8,11 @@ import type { CopilotResponse } from "../../copilotService.js";
 export async function meetingPrepHandler(
   userPrompt: string
 ): Promise<CopilotResponse> {
+
   const context = buildMeetingPreparationContext(userPrompt);
 
-  // Store conversation context for follow-up questions
   updateConversationContext({
-    lastIntent: "meetingPrep",
+    lastIntent: "meeting_prep",
     lastTopic: userPrompt,
     lastMeetingTitle: userPrompt,
   });
@@ -23,28 +23,29 @@ ${context}
 User Request:
 ${userPrompt}
 
-You are preparing the executive to lead this meeting.
+Prepare the executive for this meeting.
 
-Your objective is to ensure they can make informed decisions immediately.
+Include:
 
-Do not simply summarize information.
+- Executive Summary
+- Meeting Objective
+- Key Decisions Required
+- Risks & Dependencies
+- Relevant Emails
+- Relevant VIOLIN Updates
+- Talking Points
+- Questions to Ask
+- Recommended Next Actions
 
-Instead:
-
-- Identify decisions that may be required.
-- Connect emails with operational updates.
-- Highlight dependencies.
-- Explain potential business impact.
-- Recommend talking points.
-- Recommend follow-up questions.
+Return GitHub Markdown.
 `;
 
-  const response = await askGemini({
+  const reply = await askGemini({
     systemPrompt: EXECUTIVE_SYSTEM_PROMPT,
     userPrompt: prompt,
   });
 
   return {
-    message: response,
+    message: reply,
   };
 }

@@ -4,11 +4,7 @@ export type MeetingPriority = "low" | "normal" | "high";
 
 export type MeetingLocationType = "teams" | "in-person" | "hybrid";
 
-export type TimePreference =
-  | "morning"
-  | "afternoon"
-  | "evening"
-  | "any";
+export type TimePreference = string;
 
 export interface MeetingAttendee {
   name: string;
@@ -50,7 +46,8 @@ export interface ParsedMeetingRequest {
 export interface SchedulerSuggestion {
   success: boolean;
 
-  meeting: ParsedMeetingRequest;
+  meeting: ParsedMeetingRequest | null;
+   
 
   warnings: string[];
 

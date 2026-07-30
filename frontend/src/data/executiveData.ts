@@ -1,0 +1,93 @@
+import type { ExecutiveBrief } from "../types/executiveBrief";
+
+export const executiveData: ExecutiveBrief = {
+  meetings: [
+    {
+      id: "meeting-1",
+      subject: "Leadership Sync",
+      start: "2026-07-23T09:00:00",
+      end: "2026-07-23T10:00:00",
+      location: "Conference Room A",
+      isOnline: true,
+      teamsLink: "https://teams.microsoft.com/",
+      attendees: [],
+      agenda: "Weekly leadership updates and key decisions.",
+      description: "Leadership sync meeting.",
+      status: "upcoming",
+    },
+    {
+      id: "meeting-2",
+      subject: "SAP Deployment Review",
+      start: "2026-07-23T11:30:00",
+      end: "2026-07-23T12:30:00",
+      location: "Teams",
+      isOnline: true,
+      teamsLink: "https://teams.microsoft.com/",
+      attendees: [],
+      agenda: "Review SAP deployment progress.",
+      description: "SAP rollout review.",
+      status: "upcoming",
+    },
+    {
+      id: "meeting-3",
+      subject: "Supplier Discussion",
+      start: "2026-07-23T15:00:00",
+      end: "2026-07-23T16:00:00",
+      location: "Meeting Room B",
+      isOnline: false,
+      attendees: [],
+      agenda: "Supplier escalation discussion.",
+      description: "Supplier meeting.",
+      status: "upcoming",
+    },
+  ],
+
+  emails: [
+    {
+      id: "email-1",
+      sender: "Finance Department",
+      senderEmail: "finance@volvo.com",
+      subject: "Finance Approval Required",
+      preview: "Approval required for Q3 budget allocation.",
+      receivedAt: "2026-07-23T08:30:00",
+      importance: "high",
+      isRead: false,
+      requiresAction: true,
+    },
+    {
+      id: "email-2",
+      sender: "Production Team",
+      senderEmail: "production@volvo.com",
+      subject: "Production Issue Report",
+      preview: "A production issue has been reported overnight.",
+      receivedAt: "2026-07-23T07:45:00",
+      importance: "normal",
+      isRead: false,
+      requiresAction: true,
+    },
+    {
+      id: "email-3",
+      sender: "HR",
+      senderEmail: "hr@volvo.com",
+      subject: "HR Update",
+      preview: "Monthly HR communication.",
+      receivedAt: "2026-07-22T17:00:00",
+      importance: "low",
+      isRead: true,
+      requiresAction: false,
+    },
+  ],
+
+  actions: [
+    "Prepare Leadership Meeting",
+    "Review Priority Inbox",
+    "Generate Executive Brief",
+  ],
+
+  stats: {
+    meetings: 3,
+    unreadEmails: 2,
+    documents: 24,
+    pendingActions: 3,
+  },
+};

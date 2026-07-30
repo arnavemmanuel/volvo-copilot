@@ -1,15 +1,4 @@
-import "dotenv/config";
-import { GoogleGenAI } from "@google/genai";
-
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY is missing.");
-}
-
-const ai = new GoogleGenAI({
-  apiKey,
-});
+import { aiClient } from "./client/aiClient.js";
 
 interface GeminiRequest {
   systemPrompt: string;
@@ -20,24 +9,14 @@ export async function askGemini({
   systemPrompt,
   userPrompt,
 }: GeminiRequest): Promise<string> {
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.3,
-      },
-      contents: userPrompt,
-    });
+  const result = await aiClient.generate({
+    systemPrompt,
+    userPrompt,
+  });
 
-    return response.text ?? "No response generated.";
-  } catch (error) {
-    console.error(error);
-
-    if (error instanceof Error) {
-      return error.message;
-    }
-
-    return "Failed to connect to Gemini.";
+  if (!result.success) {
+    return result.error ?? "AI request failed.";
   }
+
+  return result.text ?? "";
 }

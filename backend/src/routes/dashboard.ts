@@ -33,7 +33,7 @@ router.get("/", (_, res) => {
         icon: "file",
       },
       {
-        title: "Pending Actions",
+        title: "Today's Priorities",
         value: 7,
         icon: "check",
       },
