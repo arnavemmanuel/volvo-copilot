@@ -62,8 +62,8 @@ ${meetings
   .join("\n")}
 `,
       actions: meetings.slice(0, 4).map((meeting, index) => ({
-        id: meeting.id ?? `meeting-${index}`,
-        entity: "meeting",
+        id: String(meeting.id) ?? `meeting-${index}`,
+        type: "meeting",
         title: meeting.title,
         subtitle: `${meeting.time} • ${meeting.location}`,
         route: "/meetings",
@@ -105,8 +105,8 @@ Return GitHub Markdown.
   return {
     message: reply,
     actions: meetings.slice(0, 4).map((meeting, index) => ({
-      id: meeting.id ?? `meeting-${index}`,
-      entity: "meeting",
+      id: String(meeting.id) ?? `meeting-${index}`,
+      type: "meeting",
       title: meeting.title,
       subtitle: `${meeting.time} • ${meeting.location}`,
       route: "/meetings",
