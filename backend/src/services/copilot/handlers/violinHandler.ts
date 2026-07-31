@@ -39,8 +39,8 @@ ${item.summary}
   .join("\n")}
 `,
       actions: violin.news.slice(0, 4).map((item, index) => ({
-        id: item.id ?? `violin-${index}`,
-        entity: "violin",
+        id: String(item.id) ?? `violin-${index}`,
+        type: "violin",
         title: item.title,
         subtitle: `${item.priority} • ${item.category}`,
         route: "/documents",
@@ -97,8 +97,8 @@ Format:
   return {
     message: reply,
     actions: violin.news.slice(0, 4).map((item, index) => ({
-      id: item.id ?? `violin-${index}`,
-      entity: "violin",
+      id: String(item.id) ?? `violin-${index}`,
+      type: "violin",
       title: item.title,
       subtitle: `${item.priority} • ${item.category}`,
       route: "/documents",
