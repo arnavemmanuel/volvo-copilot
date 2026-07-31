@@ -1,11 +1,9 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState } from "react";
 import {
   Search,
   Mail,
   Calendar,
   FileText,
-  Factory,
   ArrowRight,
 } from "lucide-react";
 
@@ -35,28 +33,14 @@ export default function SearchPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const [searchInput, setSearchInput] = useState("");
-const [showSuggestions, setShowSuggestions] = useState(false);
-
   const [filter, setFilter] = useState<
   "all" | "emails" | "meetings" | "dashboard"
 >("all");
 
   const query = params.get("q") ?? "";
-  const suggestions = [
-  "Supplier",
-  "Budget",
-  "SAP",
-  "Leadership",
-  "Steering Committee",
-  "Production",
-  "Finance",
-  "Teams",
+  
 ];
 
-const filteredSuggestions = suggestions.filter(item =>
-  item.toLowerCase().includes(searchInput.toLowerCase())
-);
   const results = searchEverything(query);
   const totalResults =
   results.emails.length +
