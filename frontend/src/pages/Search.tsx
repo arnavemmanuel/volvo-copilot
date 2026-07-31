@@ -38,9 +38,6 @@ export default function SearchPage() {
 >("all");
 
   const query = params.get("q") ?? "";
-  
-];
-
   const results = searchEverything(query);
   const totalResults =
   results.emails.length +
