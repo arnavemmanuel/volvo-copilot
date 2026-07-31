@@ -56,8 +56,8 @@ ${matchedEmail.draftReply}
 `,
       actions: [
         {
-          id: matchedEmail.id ?? "email-draft",
-          entity: "email",
+          id: String(matchedEmail.id) ?? "email-draft",
+          type: "email",
           title: matchedEmail.subject,
           subtitle: `Reply to ${matchedEmail.sender}`,
           route: "/emails",
@@ -90,8 +90,8 @@ ${matchedEmail.summary}
 `,
       actions: [
         {
-          id: matchedEmail.id ?? "email-summary",
-          entity: "email",
+          id: String(matchedEmail.id) ?? "email-summary",
+          type: "email",
           title: matchedEmail.subject,
           subtitle: `${matchedEmail.priority} • ${matchedEmail.sender}`,
           route: "/emails",
