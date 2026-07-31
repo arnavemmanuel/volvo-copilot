@@ -135,8 +135,8 @@ ${email.summary}
   .join("\n")}
 `,
       actions: relevantEmails.slice(0, 4).map((email, index) => ({
-        id: email.id ?? `email-${index}`,
-        entity: "email",
+        id: String(email.id) ?? `email-${index}`,
+        type: "email",
         title: email.subject,
         subtitle: `${email.priority} • ${email.sender}`,
         route: "/emails",
@@ -173,8 +173,8 @@ ${email.summary}
   .join("\n")}
 `,
       actions: relevantEmails.slice(0, 4).map((email, index) => ({
-        id: email.id ?? `email-${index}`,
-        entity: "email",
+        id: String(email.id) ?? `email-${index}`,
+        type: "email",
         title: email.subject,
         subtitle: `${email.priority} • ${email.sender}`,
         route: "/emails",
@@ -228,8 +228,8 @@ Sections:
   return {
     message: reply,
     actions: relevantEmails.slice(0, 4).map((email, index) => ({
-      id: email.id ?? `email-${index}`,
-      entity: "email",
+      id: String(email.id) ?? `email-${index}`,
+      type: "email",
       title: email.subject,
       subtitle: `${email.priority} • ${email.sender}`,
       route: "/emails",
