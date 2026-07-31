@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, Search, Sparkles, CheckCheck } from "lucide-react";
 import { useCopilot } from "../hooks/useCopilot";
+import { useNavigate } from "react-router-dom";
+import { getSearchSuggestions } from "../services/searchService";
 
 const initialNotifications = [
   {
@@ -27,9 +29,16 @@ const initialNotifications = [
 ];
 
 export default function TopBar() {
-  const { openCopilot, sendPrompt, loading } = useCopilot();
+  const { openCopilot, loading } = useCopilot();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
+
+
+const [showSuggestions, setShowSuggestions] = useState(false);
+
+const filteredSuggestions = getSearchSuggestions(search);
+
   const [notifications, setNotifications] = useState(initialNotifications);
   const [openNotifications, setOpenNotifications] = useState(false);
 
@@ -51,16 +60,16 @@ export default function TopBar() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function handleSearch(
+  function handleSearch(
   e: React.KeyboardEvent<HTMLInputElement>
 ) {
   if (e.key !== "Enter") return;
 
   const query = search.trim();
 
-  if (!query || loading) return;
+  if (!query) return;
 
-  await sendPrompt(query);
+  navigate(`/search?q=${encodeURIComponent(query)}`);
 
   setSearch("");
 }
@@ -74,23 +83,105 @@ export default function TopBar() {
       <div className="flex items-center justify-between gap-6">
         {/* Left */}
         <div className="flex flex-1 items-center gap-4">
-          <div className="flex max-w-xl flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
-            <Search className="h-5 w-5 text-slate-400" />
+          <div className="relative flex max-w-xl flex-1">
 
-            <input
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  onKeyDown={handleSearch}
-  type="text"
-  placeholder={
-    loading
-      ? "Copilot is searching..."
-      : "Search meetings, emails, documents..."
-  }
-  disabled={loading}
-  className="flex-1 bg-transparent text-slate-700 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed"
-/>
-          </div>
+  <div className="relative flex max-w-xl flex-1">
+
+  <div className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+
+    <Search className="h-5 w-5 text-slate-400" />
+
+    <input
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        setShowSuggestions(true);
+      }}
+      onFocus={() => setShowSuggestions(true)}
+      onBlur={() => {
+        setTimeout(() => setShowSuggestions(false), 150);
+      }}
+      onKeyDown={(e) => {
+        handleSearch(e);
+
+        if (e.key === "Escape") {
+          setShowSuggestions(false);
+        }
+      }}
+      placeholder={
+        loading
+          ? "Copilot is searching..."
+          : "Search meetings, emails, documents..."
+      }
+      disabled={loading}
+      className="flex-1 bg-transparent text-slate-700 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed"
+    />
+
+  </div>
+
+  {showSuggestions &&
+    search.trim() &&
+    filteredSuggestions.length > 0 && (
+
+      <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+
+        {filteredSuggestions.map((item) => (
+
+          <button
+            key={item}
+            onMouseDown={() => {
+              navigate(`/search?q=${encodeURIComponent(item)}`);
+              setSearch("");
+              setShowSuggestions(false);
+            }}
+            className="flex w-full items-center gap-3 border-b border-slate-100 px-5 py-3 text-left transition last:border-b-0 hover:bg-slate-50"
+          >
+            <Search className="h-4 w-4 text-slate-400" />
+
+            <span className="text-sm font-medium text-slate-700">
+              {item}
+            </span>
+
+          </button>
+
+        ))}
+
+      </div>
+
+  )}
+
+</div>
+
+  {showSuggestions &&
+    search.length > 0 &&
+    filteredSuggestions.length > 0 && (
+
+      <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+
+        {filteredSuggestions.map((item) => (
+
+          <button
+            key={item}
+            onClick={() => {
+              navigate(`/search?q=${encodeURIComponent(item)}`);
+              setSearch("");
+              setShowSuggestions(false);
+            }}
+            className="flex w-full items-center gap-3 px-5 py-3 text-left transition hover:bg-slate-50"
+          >
+            <Search className="h-4 w-4 text-slate-400" />
+
+            <span>{item}</span>
+
+          </button>
+
+        ))}
+
+      </div>
+
+  )}
+
+</div>
 
           <button
             onClick={openCopilot}

@@ -6,13 +6,16 @@ import "./index.css";
 import App from "./App";
 import { msalInstance } from "./auth/msalInstance";
 import CopilotProvider from "./providers/CopilotProvider";
+import { WorkspaceProvider } from "./context/WorkspaceContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MsalProvider instance={msalInstance}>
-      <CopilotProvider>
-        <App />
-      </CopilotProvider>
+      <WorkspaceProvider>
+        <CopilotProvider>
+          <App />
+        </CopilotProvider>
+      </WorkspaceProvider>
     </MsalProvider>
   </StrictMode>
 );

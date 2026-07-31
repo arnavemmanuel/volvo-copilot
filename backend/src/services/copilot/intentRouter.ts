@@ -7,7 +7,6 @@ import { briefHandler } from "./handlers/briefHandler.js";
 import { generalHandler } from "./handlers/generalHandler.js";
 import { meetingPrepHandler } from "./handlers/meetingPrepHandler.js";
 import { schedulerHandler } from "./handlers/schedulerHandler.js";
-
 import { intentClassifier } from "../../ai/intent/intentClassifier.js";
 import { orchestrator } from "../orchestrator/orchestrator.js";
 
@@ -106,6 +105,9 @@ export async function intentRouter(
         case "violin":
           return await violinHandler(question);
 
+        case "general":
+           return await generalHandler(question);
+
       }
 
     }
@@ -171,5 +173,5 @@ if (
 ) {
   return await schedulerHandler(question);
 }
-return await generalHandler();
+return await generalHandler(question);
 }

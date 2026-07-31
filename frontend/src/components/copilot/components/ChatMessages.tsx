@@ -10,7 +10,8 @@ import MessageBubble from "./MessageBubble";
 import SuggestedPrompts from "./SuggestedPrompts";
 
 export default function ChatMessages() {
-  const { messages, loading, sendMessage } = useCopilot();
+  const { messages, loading, sendPrompt } = useCopilot();
+  console.log("MESSAGES:", messages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function ChatMessages() {
             </div>
 
             <h2 className="text-2xl font-semibold text-slate-900">
-              Welcome to Executive Copilot
+              Welcome to Copilot
             </h2>
 
             <p className="mt-3 text-sm leading-7 text-slate-500">
@@ -60,7 +61,7 @@ export default function ChatMessages() {
           </div>
 
           <SuggestedPrompts
-            onPromptClick={(prompt) => sendMessage(prompt)}
+            onPromptClick={(prompt) => sendPrompt(prompt)}
           />
 
         </div>
@@ -97,7 +98,7 @@ export default function ChatMessages() {
                 <Sparkles className="h-4 w-4 animate-pulse text-blue-600" />
 
                 <span className="text-sm font-semibold text-slate-700">
-                  Executive Copilot is thinking...
+                 Copilot is thinking...
                 </span>
 
               </div>

@@ -6,6 +6,7 @@ export type WorkspaceView =
   | "emails"
   | "operations"
   | "chat"
+  | "search"
   | "loading";
 
 export interface CopilotAction {

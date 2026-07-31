@@ -3,6 +3,7 @@ import MeetingPrep from "./MeetingPrep";
 import PriorityEmails from "./PriorityEmails";
 import Operations from "./Operations";
 import ChatMessages from "../ChatMessages";
+import SearchResults from "./SearchResults";
 
 export type WorkspaceView =
   | "brief"
@@ -10,6 +11,7 @@ export type WorkspaceView =
   | "emails"
   | "operations"
   | "chat"
+  | "search"
   | "loading";
 
 interface WorkspaceContentProps {
@@ -24,6 +26,9 @@ export default function WorkspaceContent({
     case "chat":
     case "loading":
       return <ChatMessages />;
+
+    case "search":
+      return <SearchResults />;
 
     case "brief":
       return <ExecutiveBrief />;

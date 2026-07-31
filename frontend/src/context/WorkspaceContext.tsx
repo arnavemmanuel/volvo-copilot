@@ -11,6 +11,7 @@ export type WorkspaceView =
   | "emails"
   | "operations"
   | "chat"
+  | "search"
   | "loading";
 
 export interface ActivityItem {
@@ -23,6 +24,9 @@ export interface ActivityItem {
 interface WorkspaceContextType {
   view: WorkspaceView;
   setView: (view: WorkspaceView) => void;
+
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 
   activities: ActivityItem[];
 
@@ -44,6 +48,9 @@ export function WorkspaceProvider({
 }) {
   const [view, setView] =
     useState<WorkspaceView>("brief");
+
+  const [searchQuery, setSearchQuery] =
+    useState("");
 
   const [activities, setActivities] = useState<
     ActivityItem[]
@@ -74,6 +81,8 @@ export function WorkspaceProvider({
       value={{
         view,
         setView,
+        searchQuery,
+        setSearchQuery,
         activities,
         addActivity,
       }}

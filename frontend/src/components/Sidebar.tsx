@@ -10,7 +10,7 @@ export default function Sidebar() {
     <aside className="w-64 bg-slate-900 text-white min-h-screen p-6">
 
       <h2 className="text-3xl font-bold mb-10">
-        Volvo Executive Copilot
+        Digital Production Copilot
       </h2>
 
       <nav className="space-y-6">

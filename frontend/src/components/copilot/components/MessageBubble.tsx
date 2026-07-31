@@ -136,16 +136,32 @@ export default function MessageBubble({
                     <hr className="my-8 border-slate-200" />
                   ),
 
-                  code({ children, ...props }) {
-                    return (
-                      <code
-                        className="rounded bg-slate-100 px-1 py-0.5 text-sm"
-                        {...props}
-                      >
-                        {children}
-                      </code>
-                    );
-                  },
+                  code(props) {
+  const { inline, className, children, ...rest } = props as {
+    inline?: boolean;
+    className?: string;
+    children?: React.ReactNode;
+  };
+
+  if (inline) {
+    return (
+      <code
+        className="rounded bg-slate-100 px-1 py-0.5 text-sm"
+        {...rest}
+      >
+        {children}
+      </code>
+    );
+  }
+
+  return (
+    <pre className="my-4 overflow-x-auto rounded-lg bg-slate-900 p-4">
+      <code className={className} {...rest}>
+        {children}
+      </code>
+    </pre>
+  );
+},
                 }}
               >
                 {message.content}

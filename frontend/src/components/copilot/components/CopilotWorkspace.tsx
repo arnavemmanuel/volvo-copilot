@@ -40,7 +40,7 @@ export default function CopilotWorkspace() {
       icon: <Factory size={18} />,
     },
   ] as const;
-
+console.log("Current workspace:", workspaceView);
   return (
     <div className="flex h-full">
       {/* Sidebar */}
@@ -115,7 +115,6 @@ export default function CopilotWorkspace() {
             hasMessages={messages.length > 0}
           />
         </div>
-
         <ChatInput />
       </main>
     </div>

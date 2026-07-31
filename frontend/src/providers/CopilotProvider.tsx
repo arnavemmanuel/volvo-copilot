@@ -27,6 +27,9 @@ export default function CopilotProvider({
   const [workspaceView, setWorkspaceView] =
     useState<WorkspaceView>("brief");
 
+  const [searchQuery, setSearchQuery] =
+  useState("");
+
   const openCopilot = () => setIsOpen(true);
 
   const closeCopilot = () => setIsOpen(false);
@@ -55,6 +58,7 @@ export default function CopilotProvider({
       setLoading(true);
 
       const response = await sendCopilotMessage(prompt);
+      console.log("COPILOT RESPONSE:", response);
 
       const assistantMessage: ChatMessage = {
   id: crypto.randomUUID(),
@@ -63,6 +67,7 @@ export default function CopilotProvider({
   timestamp: new Date(),
   actions: response.actions,
 };
+console.log("ASSISTANT MESSAGE:", assistantMessage);
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch {
@@ -72,7 +77,7 @@ export default function CopilotProvider({
           id: crypto.randomUUID(),
           role: "assistant",
           content:
-            "I'm having trouble connecting to the Executive Copilot service. Please try again.",
+            "I'm having trouble connecting to the Copilot. Please try again.",
           timestamp: new Date(),
         },
       ]);
@@ -83,12 +88,15 @@ export default function CopilotProvider({
 
   const value = useMemo(
     () => ({
-      isOpen,
-      loading,
-      messages,
+  isOpen,
+  loading,
+  messages,
 
-      workspaceView,
-      setWorkspaceView,
+  workspaceView,
+  setWorkspaceView,
+
+  searchQuery,
+  setSearchQuery,
 
       openCopilot,
       closeCopilot,

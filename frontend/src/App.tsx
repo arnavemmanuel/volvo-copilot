@@ -5,6 +5,7 @@ import Meetings from "./pages/Meetings";
 import Emails from "./pages/Emails";
 import Documents from "./pages/Documents";
 import Scheduler from "./pages/Scheduler";
+import Search from "./pages/Search";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/emails" element={<Emails />} />
         <Route path="/documents" element={<Documents />} />
         <Route path="/scheduler" element={<Scheduler />} />
+        <Route path="/search" element={<Search />} />
       </Routes>
     </BrowserRouter>
   );

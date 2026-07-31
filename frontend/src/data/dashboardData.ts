@@ -15,7 +15,7 @@ export const dashboardStats = [
     icon: "file",
   },
   {
-    title: "Pending Actions",
+    title: "Today's Priorities",
     value: 7,
     icon: "check",
   },
